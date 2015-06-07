@@ -73,7 +73,10 @@ vcmap <- function(shapefile, data, mid, did, name, tag, fill=NULL, ggscale=NULL)
   gridSVG::grid.script(paste("var dtom = ", rjson::toJSON(dtom), ";", sep=""))
   gridSVG::grid.script(paste("var mtod = ", rjson::toJSON(mtod), ";", sep=""))
   
-  gridSVG::grid.export(paste(name, ".", tag, ".svg", sep=""), htmlWrapper=TRUE, exportMappings="file")
+  svgfn <- paste0(name, ".", tag, ".svg")
+  gridSVG::grid.export(svgfn, htmlWrapper=TRUE, exportMappings="file",
+                       xmldecl="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+  
   invisible(dev.off())
   
 }

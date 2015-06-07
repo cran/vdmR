@@ -36,7 +36,12 @@ vpcp <- function(data, columns, name, tag,
   gridSVG::grid.script(paste("var nrow=", nrow(data), ";"))
   gridSVG::grid.script(file=paste(name, ".", tag,".js", sep=""))
   gridSVG::grid.script(paste("var winname= '", name, "';", sep=""))
-  gridSVG::grid.export(paste(name, ".", tag, ".svg", sep=""), htmlWrapper=TRUE, exportMappings="file")
+  
+  svgfn <- paste0(name, ".", tag, ".svg")
+  
+  gridSVG::grid.export(svgfn, htmlWrapper=TRUE, exportMappings="file",
+                       xmldecl="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+
   invisible(dev.off())
   
 }

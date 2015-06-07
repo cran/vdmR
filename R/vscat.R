@@ -41,10 +41,14 @@ vscat <- function(x, y, data, name, tag, ...){
   grid::grid.newpage()
   grid::grid.draw(scatgrob)
   grid::grid.gedit("geom_point.points", name="geom_point.points")
-  gridSVG::grid.script(file=paste(name, ".", tag,".js", sep=""))
-  gridSVG::grid.script(paste("var winname= '", name,"';", sep=""))
+  gridSVG::grid.script(file=paste0(name, ".", tag,".js"))
+  gridSVG::grid.script(paste0("var winname= '", name,"';"))
   
-  gridSVG::grid.export(paste(name, ".", tag, ".svg", sep=""), htmlWrapper=TRUE, exportMappings="file")
+  svgfn <- paste0(name, ".", tag, ".svg")
+
+  gridSVG::grid.export(svgfn, htmlWrapper=TRUE, exportMappings="file",
+                       xmldecl="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+
   invisible(dev.off())
   
 }

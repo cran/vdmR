@@ -60,7 +60,7 @@ vhist <- function(x, data, name, tag, ...){
   dvp <- grid::dataViewport(xscale=plotranges$x.range, yscale=plotranges$y.range)
   
   grid::grid.rect(unique(histparam$x), 0, xmax-xmin, 
-                   0, default.units="native", gp=grid::gpar(fill="red", colour=NA), name="hlbar", vp=dvp)
+                   0, default.units="native", gp=grid::gpar(fill="red", color=NA), name="hlbar", vp=dvp)
   
   grid::pushViewport(dvp)
   
@@ -81,14 +81,15 @@ vhist <- function(x, data, name, tag, ...){
   grid::grid.newpage()
   grid::grid.draw(histgrob)
 
-  
-  e <- try(
-    gridSVG::grid.export(paste(name, ".", tag, ".svg", sep=""), htmlWrapper=TRUE, exportMappings="file"),
-    silent=TRUE
-  )
+  svgfn <- paste0(name, ".", tag, ".svg")
+
+  e <- try(gridSVG::grid.export(svgfn, htmlWrapper=TRUE, exportMappings="file",
+                                xmldecl="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"),
+           silent=TRUE)
   
   if (class(e) == "try-error") {
-    gridSVG::grid.export(paste(name, ".", tag, ".svg", sep=""), htmlWrapper=TRUE, exportMappings="file")
+    gridSVG::grid.export(svgfn, htmlWrapper=TRUE, exportMappings="file",
+                         xmldecl="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
   }
   
   invisible(dev.off())

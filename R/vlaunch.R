@@ -16,21 +16,21 @@
 #' 
 
 vlaunch <- function(data, name, tag, browse=TRUE){
-  fn <- paste(name, ".", tag, sep="")
-  basehtmlfn <- paste(".", tag, ".svg.html", sep="")
-  htmlfn <- paste(name, basehtmlfn, sep="")
-  fnregex <- paste("*", basehtmlfn, sep="")
+  fn <- paste0(name, ".", tag)
+  basehtmlfn <- paste0(".", tag, ".svg.html")
+  htmlfn <- paste0(name, basehtmlfn)
+  fnregex <- paste0("*", basehtmlfn)
   
-  winlist <- paste("var winlist=['",
+  winlist <- paste0("var winlist=['",
                    gsub(",","','",
                         paste(gsub(basehtmlfn,"",list.files(pattern=fnregex)), collapse=",")),
-                   "'];\n", sep="")
+                   "'];\n")
     
   jspath <- file.path(system.file(package="vdmR"), "exec/vdmr_main.js")
-  file.copy(jspath, paste(fn, ".js", sep=""), overwrite=TRUE)
+  file.copy(jspath, paste0(fn, ".js"), overwrite=TRUE)
   
   csspath <- file.path(system.file(package="vdmR"), "exec/vdmr_main.css")
-  file.copy(csspath, paste(fn, ".css", sep=""), overwrite=TRUE)
+  file.copy(csspath, paste0(fn, ".css"), overwrite=TRUE)
   
   z <- file(paste(fn, ".html", sep=""),"w")
   cat("<html><head><title>", file=z)
@@ -39,15 +39,15 @@ vlaunch <- function(data, name, tag, browse=TRUE){
   
   cat("<script type=\"text/javascript\"><!--\n", file=z)
   cat(winlist, file=z)
-  cat(paste("var tag='",tag,"';", sep=""), file=z)
+  cat(paste0("var tag='",tag,"';"), file=z)
   cat("\n//--></script>\n", file=z)
   
   cat("<script type=\"text/javascript\" src=\"", file=z)
-  cat(paste(fn, ".js", sep=""), file=z)
+  cat(paste0(fn, ".js"), file=z)
   cat("\"></script>", file=z)
   
   cat("<link rel=\"stylesheet\" type=\"text/css\" href=\"", file=z)
-  cat(paste(fn, ".css", sep=""), file=z)
+  cat(paste0(fn, ".css"), file=z)
   cat("\">", file=z)
   
   cat("<link rel=\"stylesheet\" type=\"text/css\" href=\"//cdn.datatables.net/1.10.0/css/jquery.dataTables.css\">", file=z)
@@ -69,10 +69,10 @@ vlaunch <- function(data, name, tag, browse=TRUE){
   
   cat("<tbody>", file=z)
   for(r in 1:nrow(data)){
-    cat("<tr>", paste(
+    cat("<tr>", paste0(
       rep("<td>", data.ncol),
       as.vector(t(data[r,])),
-      rep("</td>", data.ncol), sep=""
+      rep("</td>", data.ncol)
     ), "</tr>", sep="", file=z)
   }
   cat("</tbody></table", file=z)
@@ -81,15 +81,21 @@ vlaunch <- function(data, name, tag, browse=TRUE){
   close(z)
   
   if(browse==TRUE){
-    s <- Rook::Rhttpd$new()
-    s$add(name="vdmR",
-          app=Rook::Builder$new(
-            Rook::Static$new(
-              root=getwd(),
-              urls="/"),
-            Rook::Redirect$new(paste("/", fn, ".html", sep=""))))
-    s$start()
-    s$browse(1)
+
+    if(.Platform$GUI!='RStudio'){
+      s <- Rook::Rhttpd$new()
+      s$add(name="vdmR",
+            app=Rook::Builder$new(
+              Rook::Static$new(root=getwd(), urls="/"),
+              Rook::Redirect$new(paste0("/", fn, ".html"))))
+      s$start()
+      s$browse(1)
+    } else {
+      dir <- tempfile()
+      dir.create(dir)
+      fcp <- file.copy(list.files(".",paste0("*.",tag,".*")), dir)
+      utils::browseURL(file.path(dir,paste0(fn,".html")))
+    }
   }
   
 }
