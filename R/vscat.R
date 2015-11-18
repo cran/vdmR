@@ -8,6 +8,8 @@
 #' @param name character for the name of the generated scatter plot
 #' @param tag character for the common name of a series of linked plots
 #' @param ... aesthetic mappings to be passed to ggplot2 methods
+#' @importFrom grDevices dev.off pdf
+#' @importFrom stats asOneSidedFormula
 #' @export
 #' @examples
 #' data(vsfuk2012)
@@ -32,9 +34,10 @@ vscat <- function(x, y, data, name, tag, ...){
   jspath <- file.path(system.file(package="vdmR"), "exec/vdmr_scat.js")
   file.copy(jspath, paste(name, ".", tag, ".js", sep=""), overwrite=TRUE)
   pdf(file=NULL, width=7, height=5)
-  
+
   scat <- ggplot2::ggplot(data, aesthetics)
   scat <- scat + ggplot2::layer(geom="point", geom_params=params)
+
   
   scatgrob <- ggplot2::ggplotGrob(scat)
 
@@ -43,12 +46,15 @@ vscat <- function(x, y, data, name, tag, ...){
   grid::grid.gedit("geom_point.points", name="geom_point.points")
   gridSVG::grid.script(file=paste0(name, ".", tag,".js"))
   gridSVG::grid.script(paste0("var winname= '", name,"';"))
-  
+  gridSVG::grid.script(paste0("var x= ", rjson::toJSON(scat$data[,as.character(scat$mapping$x)]), ";"))
+  gridSVG::grid.script(paste0("var y= ", rjson::toJSON(scat$data[,as.character(scat$mapping$y)]), ";")) 
+
   svgfn <- paste0(name, ".", tag, ".svg")
 
   gridSVG::grid.export(svgfn, htmlWrapper=TRUE, exportMappings="file",
                        xmldecl="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 
   invisible(dev.off())
+
   
 }

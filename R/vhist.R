@@ -8,6 +8,8 @@
 #' @param name character for the name of the generated histogram
 #' @param tag character for the common name of a series of linked plots
 #' @param ... aesthetic mappings to be passed to ggplot2 methods
+#' @importFrom grDevices dev.off pdf
+#' @importFrom stats asOneSidedFormula
 #' @export
 #' @examples
 #' data(vsfuk2012)

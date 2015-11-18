@@ -11,6 +11,7 @@
 #' @param scale method used to scale the variables
 #' @param alphaLines value of alpha scaler for the lines of the parcoord plot or a column name of the data
 #' @param missing method used to handle missing values
+#' @importFrom grDevices dev.off pdf
 #' @export
 #' @examples
 #' data(vsfuk2012)

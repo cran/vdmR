@@ -14,8 +14,28 @@ var persistent = 0;
 
 // retrieving height of SVG
 var svgheight = parseFloat(document.documentElement.getAttribute('height').replace("px",""));
+var svgwidth = parseFloat(document.documentElement.getAttribute('width').replace("px",""));
+
+if(parent.opener){
+	pwin = parent.opener;
+} else {
+	pwin = parent.parent;
+}
+
+document.documentElement.setAttribute('onclick', 'clearIdentText(evt)');
+
+document.addEventListener('copy', function(evt){
+	evt.preventDefault();
+	evt.clipboardData.setData('text/plain', pwin.getSelectedData());
+}, false);
 
 parent.addEventListener("message", function(e){
+	
+	if(typeof e.data == 'string'){
+		selbox = document.getElementById('selbox');
+		selbox.setAttribute('visibility', e.data);
+		return;
+	}
 
 	tmp = [];
 	for(var i in e.data){
@@ -46,6 +66,7 @@ for(var j=0;j<ncol;j++){
 }
 
 var gpxflg = 0;
+var cnt = 0;
 for(var i=0; i<gpchildren.length;i++){
 	if(gpchildren[i].nodeName=='polyline'){
 		gpid.push(gpchildren[i].id);
@@ -61,8 +82,85 @@ for(var i=0; i<gpchildren.length;i++){
 			}
 			if(gpx.length==ncol) gpxflg++;
 		}
+
+		tmp = document.getElementById(gpchildren[i].id);
+		tmp.setAttribute('onmousemove', 'hoverPopUp(evt)');
+		tmp.setAttribute('onmouseout', 'hoverPopUpErase(evt)');
+		tmp.setAttribute('onclick', 'createIdentText(evt)');
+		tmp.setAttribute('desc', cnt++);
+
 	}
 }
+
+// display popup
+function hoverPopUp(evt){
+	popuptext.setAttribute('x', evt.clientX+5);
+	popuptext.setAttribute('y', evt.clientY-5);
+	num = parseInt(evt.target.getAttribute('desc'));
+	pupval = pwin.getDataValue(num, parseInt(
+		pwin.document.forms.form1.identify.selectedIndex));
+	//popuptext.textContent = 'x:'+x[num]+', '+'y:'+y[num];
+	popuptext.textContent = pupval;
+	popuptext.setAttribute('text-decoration', 'underline');
+	popuptext.setAttribute('display', 'inline');
+}
+
+// erase popup
+function hoverPopUpErase(evt){
+	popuptext.setAttribute('display', 'none');
+}
+
+
+// create popup
+
+function createPopUp(){
+	popuptext = document.createElementNS(svgns, 'text');
+	popuptext.setAttribute('id','popuptext');
+	popuptext.setAttribute('x',100);
+	popuptext.setAttribute('y',100);
+	popuptext.setAttribute('fill','#000');
+	popuptext.textContent = 'hogehoge';
+	popuptext.setAttribute('display','none');
+
+	document.documentElement.appendChild(popuptext);
+}
+
+createPopUp();
+
+// create identify text
+var identtext = Array();
+
+var identtextgroup = document.createElementNS(svgns, 'g');
+identtextgroup.setAttribute('id','identtext');
+document.documentElement.appendChild(identtextgroup);
+
+function createIdentText(evt){
+	identtext.push(document.createElementNS(svgns, 'text'));
+	i = identtext.length-1;
+
+	identtext[i].setAttribute('x', evt.clientX+5);
+	identtext[i].setAttribute('y', evt.clientY-5);
+	num = parseInt(evt.target.getAttribute('desc'));
+	pupval = pwin.getDataValue(num, parseInt(
+		pwin.document.forms.form1.identify.selectedIndex));
+	identtext[i].textContent = pupval;
+	identtext[i].setAttribute('text-decoration', 'underline');
+
+	document.documentElement.getElementById('identtext').appendChild(identtext[i]);
+
+}
+
+function clearIdentText(evt){
+	if(evt.detail==2){
+		identtextall = document.documentElement.getElementById('identtext').childNodes;
+		nlabels = identtextall.length;
+		for(i=0;i<nlabels;i++){
+			document.documentElement.getElementById('identtext').removeChild(identtextall[0]);
+		}
+		identtext = Array();
+	}
+}
+
 
 function seldetect(srx1,sry1,srx2,sry2){
 	selrange = gpx.concat([srx1,srx2]).sort(
@@ -73,18 +171,18 @@ function seldetect(srx1,sry1,srx2,sry2){
 	});
 	if(srx2>srx1) {srmin=srx1; srmax=srx2;}
 	else {srmin=srx2; srmax=srx1;}
-	
+
 	// delete the both ends of selrange when selection area is out of range of x
 	if(selrange[0]<gpx[0]) selrange.shift();
 	if(selrange[selrange.length-1]>gpx[ncol-1]) selrange.pop();
-	
+
 	while(selrange[0]<srmin){
 		selrange.shift();
 	}
 	while(selrange[selrange.length-1]>srmax){
 		selrange.pop();
 	}
-	
+
 	// turnback when selection area is out of parallel coordinates
 	if(selrange.length<2 && persistent==0){
 		for(var i=0;i<nrow;i++){
@@ -94,7 +192,7 @@ function seldetect(srx1,sry1,srx2,sry2){
 
 	sidx=0;
 	while(selrange[0]>=gpx[sidx]) sidx++;
-	
+
 	for(var sridx=0;sridx<selrange.length-1;sridx++){
 		x1 = selrange[sridx];
 		x2 = selrange[sridx+1];
@@ -122,7 +220,7 @@ function highlight(pid){
 	p.setAttribute("stroke-opacity", 1);
 }
 
-// opacity‚ð‚Ç‚Á‚©‚ÅŠo‚¦‚Æ‚©‚ñ‚Æ‚¢‚©‚ñi—vC³j
+// opacityï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ÅŠoï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½vï¿½Cï¿½ï¿½ï¿½j
 function turnback(pid){
 	var p = document.getElementById(pid);
 	p.setAttribute("stroke", hidcol[pid]);
@@ -133,6 +231,21 @@ function turnback(pid){
 }
 
 // selection box
+
+function createSelLayer(){
+	selLayer = document.createElementNS(svgns, 'rect');
+	selLayer.setAttribute('x', 0);
+	selLayer.setAttribute('y', 0);
+	selLayer.setAttribute('width', svgwidth);
+	selLayer.setAttribute('height', svgheight);
+	selLayer.setAttribute('id', 'selLayer');
+	selLayer.setAttribute('fill', 'green');
+	selLayer.setAttribute('opacity', 0.0);
+	selLayer.setAttribute('pointer-events','none');
+
+	document.documentElement.appendChild(selLayer);
+
+}
 
 function createSelBox(){
 
@@ -157,12 +270,14 @@ function createSelBox(){
 
 	selsymb.appendChild(selrect);
 
-	selhandle = document.createElementNS(svgns, 'circle');
+	selhandle = document.createElementNS(svgns, 'ellipse');
 	selhandle.setAttribute('cx','100');
 	selhandle.setAttribute('cy','100');
-	selhandle.setAttribute('r','20');
+	selhandle.setAttribute('rx','20');
+	selhandle.setAttribute('ry','20');
+
 	selhandle.setAttribute('style', 'cursor: se-resize');
-	
+
 	selhandle.setAttribute('onmousedown', "selectHandle(evt);");
 
 	selsymb.appendChild(selhandle);
@@ -186,6 +301,7 @@ function createSelBox(){
 
 }
 
+createSelLayer();
 createSelBox();
 
 function selectSelBox(evt){
@@ -193,15 +309,17 @@ function selectSelBox(evt){
 	currentX = evt.clientX;
 	currentY = evt.clientY;
 	currentMatrix = selectedElement.getAttribute("transform").slice(7,-1).split(' ');
-	
+
 	for(var i=0; i<currentMatrix.length; i++){
 		currentMatrix[i] = parseFloat(currentMatrix[i]);
 	}
-	
+
+	selLayer.setAttributeNS(null, "pointer-events", "inherit");
+	selLayer.setAttributeNS(null, "onmousemove", "moveSelBox(evt)");
+	selLayer.setAttributeNS(null, "onmouseup", "deselectSelBox(evt)");
 	selectedElement.setAttributeNS(null, "onmousemove", "moveSelBox(evt)");
-	selectedElement.setAttributeNS(null, "onmouseout", "deselectSelBox(evt)");
 	selectedElement.setAttributeNS(null, "onmouseup", "deselectSelBox(evt)");
-	
+
 }
 
 function moveSelBox(evt){
@@ -210,21 +328,23 @@ function moveSelBox(evt){
 	currentMatrix[4] += dx;
 	currentMatrix[5] += dy;
 	newMatrix = "matrix(" + currentMatrix.join(' ') + ")";
-	          
+
 	selectedElement.setAttributeNS(null, "transform", newMatrix);
 	currentX = evt.clientX;
 	currentY = evt.clientY;
 
 	seldetect(currentMatrix[4], svgheight-currentMatrix[5], currentMatrix[4]+currentW, svgheight-currentMatrix[5]-currentH);
-	
+
 }
 
 function deselectSelBox(evt){
   if(selectedElement != 0){
-  	parent.opener.postMessage({'hid':hidnum, 'winname':winname}, "*");
+  	pwin.postMessage({'hid':hidnum, 'winname':winname}, "*");
+    selLayer.removeAttributeNS(null, "onmousemove");
+    selLayer.removeAttributeNS(null, "onmouseup");
     selectedElement.removeAttributeNS(null, "onmousemove");
-    selectedElement.removeAttributeNS(null, "onmouseout");
     selectedElement.removeAttributeNS(null, "onmouseup");
+	selLayer.setAttributeNS(null, "pointer-events", "none");
     selectedElement = 0;
   }
 }
@@ -239,30 +359,38 @@ function selectHandle(evt){
 	currentW = parseFloat(selectedElement.getAttributeNS(null, 'width'));
 	currentH = parseFloat(selectedElement.getAttributeNS(null, 'height'));
 
+	selLayer.setAttributeNS(null, "pointer-events", "inherit");
+	selLayer.setAttributeNS(null, "onmousemove", "moveHandle(evt)");
+	selLayer.setAttributeNS(null, "onmouseup", "deselectHandle(evt)");
 	selectedElement.setAttributeNS(null, "onmousemove", "moveHandle(evt)");
-	selectedElement.setAttributeNS(null, "onmouseout", "deselectHandle(evt)");
 	selectedElement.setAttributeNS(null, "onmouseup", "deselectHandle(evt)");
-	
+
+	selhandle.setAttributeNS(null, 'fill', '#ff0000');
+
 }
 
 function moveHandle(evt){
 	dx = evt.clientX - currentX;
 	dy = evt.clientY - currentY;
-	
+
 	currentW = currentW + dx;
 	currentH = currentH + dy;
-	
+
 	selbox = document.getElementById('selbox');
 
-	selbox.setAttributeNS(null, 'width', currentW);
-	selbox.setAttributeNS(null, 'height', currentH);
-	
+	if(currentW>10 && currentH>10){
+		selbox.setAttributeNS(null, 'width', currentW);
+		selbox.setAttributeNS(null, 'height', currentH);
+		selhandle.setAttributeNS(null, 'rx', 20*50/currentW);
+		selhandle.setAttributeNS(null, 'ry', 20*50/currentH);
+	}
 
 	currentX = evt.clientX;
 	currentY = evt.clientY;
 }
 
 function deselectHandle(evt){
+	selhandle.setAttributeNS(null, 'fill', 'black');
 	deselectSelBox(evt);
 }
 
@@ -278,4 +406,3 @@ function dblclickSelBox(evt){
 		}
 	}
 }
-

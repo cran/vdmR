@@ -1,8 +1,8 @@
 var svgns = "http://www.w3.org/2000/svg";
 var xlinkns = "http://www.w3.org/1999/xlink";
 
-var hidcol = {}; 
-var hidnum = {}; 
+var hidcol = {};
+var hidnum = {};
 
 var selectedElement = 0;
 var currentX = 0;
@@ -12,13 +12,35 @@ var currentMatrix = 0;
 // persistent selection or not (default: not persistent)
 var persistent = 0;
 
+// retrieving height of SVG
+var svgheight = parseFloat(document.documentElement.getAttribute('height').replace("px",""));
+var svgwidth = parseFloat(document.documentElement.getAttribute('width').replace("px",""));
+
+if(parent.opener){
+	pwin = parent.opener;
+} else {
+	pwin = parent.parent;
+}
+
+document.addEventListener('copy', function(evt){
+	evt.preventDefault();
+	evt.clipboardData.setData('text/plain', pwin.getSelectedData());
+}, false);
+
 parent.addEventListener("message", function(e){
+
+	if(typeof e.data == 'string'){
+		selbox = document.getElementById('selbox');
+		selbox.setAttribute('visibility', e.data);
+		return;
+	}
+
 	turnbackall();
 	for(var i=0;i<hlcount.length;i++) hlcount[i]=0;
 	for(var i in e.data){
 		hlcount[whichcls[e.data[i]-1]-1]++;
 	}
-	
+
 	sethlbar();
 
 }, false);
@@ -68,6 +90,8 @@ for(var i=0; i<grchildren.length; i++){
 		gry.push(parseFloat(grchildren[i].getAttribute('y')));
 		grw.push(parseFloat(grchildren[i].getAttribute('width')));
 		grh.push(parseFloat(grchildren[i].getAttribute('height')));
+		grchildren[i].setAttribute('onmousemove', 'hoverPopUp(evt)');
+		grchildren[i].setAttribute('onmouseout', 'hoverPopUpErase(evt)');
 	}
 }
 
@@ -95,7 +119,57 @@ for(var i=0; i<grxidx.length-1; i++){
 
 grx2 = grxunq;
 
+
+// display popup
+function hoverPopUp(evt){
+	popuptext.setAttribute('x', evt.clientX+5);
+	popuptext.setAttribute('y', evt.clientY-5);
+	histbarx = parseFloat(evt.target.getAttribute('x'));
+	k = grxunq.indexOf(histbarx);
+	hovertext = '['+xmin[k]+','+xmax[k]+'] count: '+count[k];
+	popuptext.textContent = hovertext;
+	popuptext.setAttribute('text-decoration', 'underline');
+	popuptext.setAttribute('display', 'inline');
+}
+
+// erase popup
+function hoverPopUpErase(evt){
+	popuptext.setAttribute('display', 'none');
+}
+
+// create popup
+
+function createPopUp(){
+	popuptext = document.createElementNS(svgns, 'text');
+	popuptext.setAttribute('id','popuptext');
+	popuptext.setAttribute('x',100);
+	popuptext.setAttribute('y',100);
+	popuptext.setAttribute('fill','#000');
+	popuptext.textContent = 'hogehoge';
+	popuptext.setAttribute('display','none');
+
+	document.documentElement.appendChild(popuptext);
+}
+
+createPopUp();
+
+
 // selection box
+
+function createSelLayer(){
+	selLayer = document.createElementNS(svgns, 'rect');
+	selLayer.setAttribute('x', 0);
+	selLayer.setAttribute('y', 0);
+	selLayer.setAttribute('width', svgwidth);
+	selLayer.setAttribute('height', svgheight);
+	selLayer.setAttribute('id', 'selLayer');
+	selLayer.setAttribute('fill', 'green');
+	selLayer.setAttribute('opacity', 0.0);
+	selLayer.setAttribute('pointer-events','none');
+
+	document.documentElement.appendChild(selLayer);
+
+}
 
 function createSelBox(){
 
@@ -120,12 +194,14 @@ function createSelBox(){
 
 	selsymb.appendChild(selrect);
 
-	selhandle = document.createElementNS(svgns, 'circle');
+	selhandle = document.createElementNS(svgns, 'ellipse');
 	selhandle.setAttribute('cx','100');
 	selhandle.setAttribute('cy','100');
-	selhandle.setAttribute('r','20');
+	selhandle.setAttribute('rx','20');
+	selhandle.setAttribute('ry','20');
+
 	selhandle.setAttribute('style', 'cursor: se-resize');
-	
+
 	selhandle.setAttribute('onmousedown', "selectHandle(evt);");
 
 	selsymb.appendChild(selhandle);
@@ -149,6 +225,7 @@ function createSelBox(){
 
 }
 
+createSelLayer();
 createSelBox();
 
 function selectSelBox(evt){
@@ -156,15 +233,16 @@ function selectSelBox(evt){
 	currentX = evt.clientX;
 	currentY = evt.clientY;
 	currentMatrix = selectedElement.getAttribute("transform").slice(7,-1).split(' ');
-	
+
 	for(var i=0; i<currentMatrix.length; i++){
 		currentMatrix[i] = parseFloat(currentMatrix[i]);
 	}
-	
+
+	selLayer.setAttributeNS(null, "pointer-events", "inherit");
+	selLayer.setAttributeNS(null, "onmousemove", "moveSelBox(evt)");
+	selLayer.setAttributeNS(null, "onmouseup", "deselectSelBox(evt)");
 	selectedElement.setAttributeNS(null, "onmousemove", "moveSelBox(evt)");
-	selectedElement.setAttributeNS(null, "onmouseout", "deselectSelBox(evt)");
 	selectedElement.setAttributeNS(null, "onmouseup", "deselectSelBox(evt)");
-	
 }
 
 function moveSelBox(evt){
@@ -173,7 +251,7 @@ function moveSelBox(evt){
 	currentMatrix[4] += dx;
 	currentMatrix[5] += dy;
 	newMatrix = "matrix(" + currentMatrix.join(' ') + ")";
-	          
+
 	selectedElement.setAttributeNS(null, "transform", newMatrix);
 	currentX = evt.clientX;
 	currentY = evt.clientY;
@@ -182,10 +260,10 @@ function moveSelBox(evt){
 		if(grx2[i]+grw2[i]>=currentMatrix[4] && currentMatrix[4]+currentW>=grx2[i]){
 			hlcount[i] = count[i];
 		} else if(persistent==0) hlcount[i] = 0;
-		
+
 		sethlbar();
 	}
-	
+
 	// retrieving indeices of the observation in the selected class,
 	// and post them to the main window
 	if(persistent==0) hidnum = {};
@@ -202,10 +280,12 @@ function moveSelBox(evt){
 
 function deselectSelBox(evt){
   if(selectedElement != 0){
-  	parent.opener.postMessage({'hid':hidnum, 'winname':winname}, "*");
+  	pwin.postMessage({'hid':hidnum, 'winname':winname}, "*");
+    selLayer.removeAttributeNS(null, "onmousemove");
+    selLayer.removeAttributeNS(null, "onmouseup");
     selectedElement.removeAttributeNS(null, "onmousemove");
-    selectedElement.removeAttributeNS(null, "onmouseout");
     selectedElement.removeAttributeNS(null, "onmouseup");
+		selLayer.setAttributeNS(null, "pointer-events", "none");
     selectedElement = 0;
   }
 }
@@ -220,30 +300,38 @@ function selectHandle(evt){
 	currentW = parseFloat(selectedElement.getAttributeNS(null, 'width'));
 	currentH = parseFloat(selectedElement.getAttributeNS(null, 'height'));
 
+	selLayer.setAttributeNS(null, "pointer-events", "inherit");
+	selLayer.setAttributeNS(null, "onmousemove", "moveHandle(evt)");
+	selLayer.setAttributeNS(null, "onmouseup", "deselectHandle(evt)");
 	selectedElement.setAttributeNS(null, "onmousemove", "moveHandle(evt)");
-	selectedElement.setAttributeNS(null, "onmouseout", "deselectHandle(evt)");
 	selectedElement.setAttributeNS(null, "onmouseup", "deselectHandle(evt)");
-	
+
+	selhandle.setAttributeNS(null, 'fill', '#ff0000');
+
 }
 
 function moveHandle(evt){
 	dx = evt.clientX - currentX;
 	dy = evt.clientY - currentY;
-	
+
 	currentW = currentW + dx;
 	currentH = currentH + dy;
-	
+
 	selbox = document.getElementById('selbox');
 
-	selbox.setAttributeNS(null, 'width', currentW);
-	selbox.setAttributeNS(null, 'height', currentH);
-	
+	if(currentW>10 && currentH>10){
+		selbox.setAttributeNS(null, 'width', currentW);
+		selbox.setAttributeNS(null, 'height', currentH);
+		selhandle.setAttributeNS(null, 'rx', 20*50/currentW);
+		selhandle.setAttributeNS(null, 'ry', 20*50/currentH);
+	}
 
 	currentX = evt.clientX;
 	currentY = evt.clientY;
 }
 
 function deselectHandle(evt){
+	selhandle.setAttributeNS(null, 'fill', 'black');
 	deselectSelBox(evt);
 }
 

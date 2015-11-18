@@ -7,7 +7,7 @@ is.const <- function(x){
   sapply(x, function(x) "I" %in% all.names(asOneSidedFormula(x)))
 }
 
-stdaes <- c("color", "color", "color", "shape", "size", "linetype", "size", "angle", "hjust",
+stdaes <- c("colour", "colour", "colour", "shape", "size", "linetype", "size", "angle", "hjust",
             "fill", "color", "ymin", "ymax")
 
 names(stdaes) <- c("col", "color", "colour", "pch", "size", "lty", "lwd", "srt", "adj",
