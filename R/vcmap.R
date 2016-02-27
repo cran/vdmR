@@ -74,6 +74,9 @@ vcmap <- function(shapefile, data, mid, did, name, tag, fill=NULL, ggscale=NULL)
   mapgrob <- ggplot2::ggplotGrob(p)
   grid::grid.newpage()
   grid::grid.draw(mapgrob)
+  
+  grid::grid.force()
+  
   if(packageVersion("ggplot2")>'1.0.1'){
     grid::grid.gedit("geom_polygon.polygon", name="GRID.polygon")
   } else {

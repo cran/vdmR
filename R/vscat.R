@@ -50,6 +50,7 @@ vscat <- function(x, y, data, name, tag, ...){
 
   grid::grid.newpage()
   grid::grid.draw(scatgrob)
+  grid::grid.force()
   grid::grid.gedit("geom_point.points", name="geom_point.points")
   gridSVG::grid.script(file=paste0(name, ".", tag,".js"))
   gridSVG::grid.script(paste0("var winname= '", name,"';"))

@@ -64,6 +64,8 @@ vhist <- function(x, data, name, tag, ...){
 
   count <- as.vector(tapply(histparam$count, factor(histparam$xmax), sum))
 
+  grid::grid.force()
+  
   grid::downViewport("panel.3-4-3-4")
 
   dvp <- grid::dataViewport(xscale=plotranges$x.range, yscale=plotranges$y.range)
@@ -72,7 +74,7 @@ vhist <- function(x, data, name, tag, ...){
                    0, default.units="native", gp=grid::gpar(fill="red", color=NA), name="hlbar", vp=dvp)
 
   grid::pushViewport(dvp)
-
+  
   grid::grid.gedit("geom_rect.rect", name="geom_rect.rect")
 
   grid::upViewport(2)

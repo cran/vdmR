@@ -31,6 +31,7 @@ vpcp <- function(data, columns, name, tag,
   pcpgrob <- ggplot2::ggplotGrob(pcp)
   grid::grid.newpage()
   grid::grid.draw(pcpgrob)
+  grid::grid.force()
   grid::grid.gedit("GRID.polyline", name="GRID.polyline")
   
   gridSVG::grid.script(paste("var ncol=", length(columns), ";"))
