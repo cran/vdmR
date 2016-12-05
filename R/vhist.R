@@ -51,7 +51,12 @@ vhist <- function(x, data, name, tag, ...){
 
   gghist <- print(histqp)
   histparam <- gghist$data[[1]]
-  plotranges <- gghist$panel$ranges[[1]]
+  
+  if(packageVersion("ggplot2")<'2.2.0'){
+    plotranges <- gghist$panel$ranges[[1]]
+  } else {
+    plotranges <- gghist$layout$panel_ranges[[1]]
+  }
 
   # "unique" is for multiple colored histogram
   xmax <- unique(histparam$xmax)
@@ -66,8 +71,12 @@ vhist <- function(x, data, name, tag, ...){
 
   grid::grid.force()
   
-  grid::downViewport("panel.3-4-3-4")
-
+  if(packageVersion("ggplot2")<'2.2.0'){
+    grid::downViewport("panel.3-4-3-4")
+  } else {
+    grid::downViewport("panel.6-4-6-4")
+  }
+  
   dvp <- grid::dataViewport(xscale=plotranges$x.range, yscale=plotranges$y.range)
 
   grid::grid.rect(unique(histparam$x), 0, xmax-xmin,

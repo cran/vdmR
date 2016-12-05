@@ -28,19 +28,18 @@ vcmap <- function(shapefile, data, mid, did, name, tag, fill=NULL, ggscale=NULL)
   jspath <- file.path(system.file(package="vdmR"), "exec/vdmr_cmap.js")
   file.copy(jspath, paste(name, ".", tag, ".js", sep=""), overwrite=TRUE)
 
-  spdf <- readShapePoly(shapefile, IDvar=mid)
+  spdf <- maptools::readShapePoly(shapefile, IDvar=mid)
 
   data$no <- 1:nrow(data)
 
-  #map <- ggplot2::fortify(spdf, region=mid)
-  map <- broom::tidy(spdf, region=mid)
-  map <- merge(map, data, by.x="id", by.y=did)
+  map <- broom::tidy(spdf, region=mid, avoidGEOS=TRUE)
+  map <- sp::merge(map, data, by.x="id", by.y=did)
 
   map <- dplyr::arrange(map, map[["no"]], map[["group"]], map[["order"]])
 
   mapid <- unique(map$id)
 
-  mdmapping <- merge(data.frame(x=mapid, mapid=1:length(mapid)),
+  mdmapping <- sp::merge(data.frame(x=mapid, mapid=1:length(mapid)),
                      data.frame(x=data[did], did=1:nrow(data)), by.x="x", by.y=did, all=TRUE)
 
   mtod <- mdmapping$did

@@ -35,8 +35,7 @@ document.addEventListener('copy', function(evt){
 parent.addEventListener("message", function(e){
 	
 	if(typeof e.data == 'string'){
-		selbox = document.getElementById('selbox');
-		selbox.setAttribute('visibility', e.data);
+		selboxSetVisibility(e.data);
 		return;
 	}
 
@@ -186,76 +185,59 @@ function createSelLayer(){
 
 function createSelBox(){
 
-	seldefs = document.createElementNS(svgns, 'defs');
-
-	selsymb = document.createElementNS(svgns, 'symbol');
-	selsymb.setAttribute('id', 'selsymb');
-	selsymb.setAttribute('opacity', '0.5');
-	selsymb.setAttribute('viewBox', '0 0 100 100');
-	selsymb.setAttribute('preserveAspectRatio', 'none');
-
 	selrect = document.createElementNS(svgns, 'rect');
+	selrect.setAttribute('id', 'selbox');
 	selrect.setAttribute('x','0');
 	selrect.setAttribute('y','0');
 	selrect.setAttribute('id', 'selrect');
-	selrect.setAttribute('width','100');
-	selrect.setAttribute('height','100');
+	selrect.setAttribute('width','50');
+	selrect.setAttribute('height','50');
 	selrect.setAttribute('fill', 'grey');
+	selrect.setAttribute('opacity', '0.5');
 	selrect.setAttribute('style', 'cursor: move');
+	selrect.setAttribute('stroke', 'black');
+	selrect.setAttribute('stroke-dasharray', '2');
+	selrect.setAttribute('transform', "matrix(1 0 0 1 0 0)");
+	
+	selrect.setAttributeNS(null, 'onclick', "dblclickSelBox(evt)");
+	selrect.setAttributeNS(null, 'onmousedown', "selectSelBox(evt);");
 
-	selrect.setAttribute('onmousedown', "selectSelBox(evt);");
+	document.documentElement.appendChild(selrect);
 
-	selsymb.appendChild(selrect);
+}
 
-	selhandle = document.createElementNS(svgns, 'ellipse');
-	selhandle.setAttribute('cx','100');
-	selhandle.setAttribute('cy','100');
-	selhandle.setAttribute('rx','20');
-	selhandle.setAttribute('ry','20');
-
-	selhandle.setAttribute('style', 'cursor: se-resize');
-
-	selhandle.setAttribute('onmousedown', "selectHandle(evt);");
-
-	selsymb.appendChild(selhandle);
-
-	seldefs.appendChild(selsymb);
-
-	document.documentElement.appendChild(seldefs);
-
-	selbox = document.createElementNS(svgns, 'use');
-	selbox.setAttributeNS(xlinkns, 'xlink:href', '#selsymb');
-	selbox.setAttribute('x','0');
-	selbox.setAttribute('y','0');
-	selbox.setAttribute('width','50');
-	selbox.setAttribute('height','50');
-	selbox.setAttribute('id', 'selbox');
-	selbox.setAttribute('transform', "matrix(1 0 0 1 0 0)");
-
-	selbox.setAttributeNS(null, "onclick", "dblclickSelBox(evt)");
-
-	document.documentElement.appendChild(selbox);
-
+function createHandle(){
+	handle = document.createElementNS(svgns, 'rect');
+	handle.setAttribute('id', 'handle');
+	handle.setAttribute('x', '40');
+	handle.setAttribute('y', '40');
+	handle.setAttribute('width', '10');
+	handle.setAttribute('height', '10');
+	handle.setAttribute('opacity', '0.5');
+	handle.setAttribute('style', 'cursor: se-resize');
+	handle.setAttribute('transform', "matrix(1 0 0 1 0 0)");
+	handle.setAttribute('onmousedown', "selectHandle(evt);");
+	document.documentElement.appendChild(handle);
 }
 
 createSelLayer();
 createSelBox();
+createHandle();
 
 function selectSelBox(evt){
-	selectedElement = document.getElementById("selbox");
+	selectedElement = 1;
 	currentX = evt.clientX;
 	currentY = evt.clientY;
-	currentMatrix = selectedElement.getAttribute("transform").slice(7,-1).split(' ');
-
+	currentMatrix = selrect.getAttribute("transform").slice(7,-1).split(' ');
 	for(var i=0; i<currentMatrix.length; i++){
 		currentMatrix[i] = parseFloat(currentMatrix[i]);
 	}
-
+	
 	selLayer.setAttributeNS(null, "pointer-events", "inherit");
 	selLayer.setAttributeNS(null, "onmousemove", "moveSelBox(evt)");
 	selLayer.setAttributeNS(null, "onmouseup", "deselectSelBox(evt)");
-	selectedElement.setAttributeNS(null, "onmousemove", "moveSelBox(evt)");
-	selectedElement.setAttributeNS(null, "onmouseup", "deselectSelBox(evt)");
+	selrect.setAttributeNS(null, "onmousemove", "moveSelBox(evt)");
+	selrect.setAttributeNS(null, "onmouseup", "deselectSelBox(evt)");
 }
 
 function moveSelBox(evt){
@@ -265,10 +247,11 @@ function moveSelBox(evt){
 	currentMatrix[5] += dy;
 	newMatrix = "matrix(" + currentMatrix.join(' ') + ")";
 
-	selectedElement.setAttributeNS(null, "transform", newMatrix);
+	selrect.setAttributeNS(null, "transform", newMatrix);
+	handle.setAttributeNS(null, "transform", newMatrix);
 	currentX = evt.clientX;
 	currentY = evt.clientY;
-
+	
 	for(var i=0;i<gpx.length;i++){
 		if(gpx[i]>currentMatrix[4] && gpx[i]<currentMatrix[4]+currentW && gpy[i]<svgheight-currentMatrix[5] && gpy[i]>svgheight-currentMatrix[5]-currentH){
 			if(!hidcol[gpid[i]]) highlight(gpid[i]);
@@ -282,8 +265,10 @@ function deselectSelBox(evt){
   	pwin.postMessage({'hid':hidnum, 'winname':winname}, "*");
     selLayer.removeAttributeNS(null, "onmousemove");
     selLayer.removeAttributeNS(null, "onmouseup");
-    selectedElement.removeAttributeNS(null, "onmousemove");
-    selectedElement.removeAttributeNS(null, "onmouseup");
+    selrect.removeAttributeNS(null, "onmousemove");
+    selrect.removeAttributeNS(null, "onmouseup");   
+    handle.removeAttributeNS(null, "onmousemove");
+    handle.removeAttributeNS(null, "onmouseup");
 	selLayer.setAttributeNS(null, "pointer-events", "none");
     selectedElement = 0;
   }
@@ -293,20 +278,22 @@ var currentW = 50;
 var currentH = 50;
 function selectHandle(evt){
 
-	selectedElement = document.getElementById('selbox');
+	selectedElement = 1;
 	currentX = evt.clientX;
 	currentY = evt.clientY;
 
-	currentW = parseFloat(selectedElement.getAttributeNS(null, 'width'));
-	currentH = parseFloat(selectedElement.getAttributeNS(null, 'height'));
+	currentW = parseFloat(selrect.getAttributeNS(null, 'width'));
+	currentH = parseFloat(selrect.getAttributeNS(null, 'height'));
 
 	selLayer.setAttributeNS(null, "pointer-events", "inherit");
 	selLayer.setAttributeNS(null, "onmousemove", "moveHandle(evt)");
 	selLayer.setAttributeNS(null, "onmouseup", "deselectHandle(evt)");
-	selectedElement.setAttributeNS(null, "onmousemove", "moveHandle(evt)");
-	selectedElement.setAttributeNS(null, "onmouseup", "deselectHandle(evt)");
+	selrect.setAttributeNS(null, "onmousemove", "moveHandle(evt)");
+	selrect.setAttributeNS(null, "onmouseup", "deselectHandle(evt)");
+	handle.setAttributeNS(null, "onmousemove", "moveHandle(evt)");
+	handle.setAttributeNS(null, "onmouseup", "deselectHandle(evt)");
 
-	selhandle.setAttributeNS(null, 'fill', '#ff0000');
+	handle.setAttributeNS(null, 'fill', '#ff0000');
 
 }
 
@@ -317,13 +304,13 @@ function moveHandle(evt){
 	currentW = currentW + dx;
 	currentH = currentH + dy;
 
-	selbox = document.getElementById('selbox');
-
 	if(currentW>10 && currentH>10){
-		selbox.setAttributeNS(null, 'width', currentW);
-		selbox.setAttributeNS(null, 'height', currentH);
-		selhandle.setAttributeNS(null, 'rx', 20*50/currentW);
-		selhandle.setAttributeNS(null, 'ry', 20*50/currentH);
+		rx = parseFloat(selrect.getAttribute('x'));
+		ry = parseFloat(selrect.getAttribute('y'));
+		selrect.setAttributeNS(null, 'width', currentW);
+		selrect.setAttributeNS(null, 'height', currentH);
+		handle.setAttributeNS(null, 'x', rx+currentW-10);
+		handle.setAttributeNS(null, 'y', ry+currentH-10);
 	}
 
 	currentX = evt.clientX;
@@ -331,8 +318,13 @@ function moveHandle(evt){
 }
 
 function deselectHandle(evt){
-	selhandle.setAttributeNS(null, 'fill', 'black');
+	handle.setAttributeNS(null, 'fill', 'black');
 	deselectSelBox(evt);
+}
+
+function selboxSetVisibility(v){
+	selrect.setAttribute('visibility',v);
+	handle.setAttribute('visibility',v);
 }
 
 function dblclickSelBox(evt){
