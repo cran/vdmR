@@ -29,9 +29,9 @@ vpcp(vsfuk2012, 4:17, "pcp1", "vsfuk2012",
      groupColumn="Type", scale="uniminmax", missing="min10")
 
 ## ------------------------------------------------------------------------
-library(maptools)
+library(rgdal)
 shp.path <- file.path(system.file(package="vdmR"), "etc/shapes/fukuoka2012.shp")
-vsfuk2012.spdf <- readShapeSpatial(shp.path, IDvar="CityCode")
+vsfuk2012.spdf <- readOGR(shp.path)
 head(vsfuk2012.spdf@data)
 
 ## ------------------------------------------------------------------------

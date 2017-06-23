@@ -35,4 +35,3 @@ vcmap(shp.path, kk2012, "CityCode", "CityCode", "map1", "kk2012")
 vlaunch(kk2012, "main", "kk2012", browse=FALSE)
 
 }
-

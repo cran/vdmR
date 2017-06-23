@@ -175,11 +175,11 @@ Note that the argument of \texttt{groupColumn} require the character of the colu
 \subsection[Choropleth map: vcmap()]{choropleth map: \texttt{vcmap()}}
 The interactive version of a choropleth map in which polygons of the areas are painted in proportion to the value of the specific variable is one of the central feature of \pkg{vdmR} package. By using the choropleth map in the multiple linked views, it will be easy to see the relationship between the spatial characteristics and the multivariate characteristics. The interactive linked micromap plot is one of the interactive application of the choropleth map.
 
-To generate the interactive choropleth map in \pkg{vdmR}, you have to prepare the ESRI shapefile including the region for the dataset in which attribute table has a common column of the id column of the data frame. The \pkg{vdmR} package provides a sample shapefile related to the data \texttt{vsfuk2012}. By using \pkg{maptools} package it is possible to import the shapefile into \textsf{R} environment as \texttt{SpatialPolygonsDataFrame} object as follows:
+To generate the interactive choropleth map in \pkg{vdmR}, you have to prepare the ESRI shapefile including the region for the dataset in which attribute table has a common column of the id column of the data frame. The \pkg{vdmR} package provides a sample shapefile related to the data \texttt{vsfuk2012}. By using \pkg{rgdal} package it is possible to import the shapefile into \textsf{R} environment as \texttt{SpatialPolygonsDataFrame} object as follows:
 <<>>=
-library(maptools)
+library(rgdal)
 shp.path <- file.path(system.file(package="vdmR"), "etc/shapes/fukuoka2012.shp")
-vsfuk2012.spdf <- readShapeSpatial(shp.path, IDvar="CityCode")
+vsfuk2012.spdf <- readOGR(shp.path)
 head(vsfuk2012.spdf@data)
 @
 If the shapefile doesn't have the common column of the id column of the data frame, you need to edit the shapefile by using desktop GIS software such as \textsf{QGIS} or \textsf{ArcGIS} or edit the data frame.

@@ -1,8 +1,8 @@
 Package: vdmR
 Type: Package
 Title: Visual Data Mining Tools for R
-Version: 0.2.3
-Date: 2016-12-03
+Version: 0.2.4
+Date: 2017-06-23
 Author: Tomokazu Fujino
 Maintainer: Tomokazu Fujino <fujino@fwu.ac.jp>
 Description: This provides web-based visual data-mining tools by adding
@@ -12,11 +12,11 @@ Description: This provides web-based visual data-mining tools by adding
 VignetteBuilder: knitr
 Depends: R (>= 3.0.0)
 Imports: ggplot2, plyr, gridSVG, grid, rjson, GGally, Rook, dplyr,
-        broom, maptools, sp
-Suggests: testthat, rgeos, knitr
+        broom, rgdal, maptools, rgeos, sp
+Suggests: testthat, knitr
 License: GPL-2
 NeedsCompilation: no
-Packaged: 2016-12-05 01:41:03 UTC; fujino
-RoxygenNote: 5.0.1
+Packaged: 2017-06-14 03:58:44 UTC; fujino
+RoxygenNote: 6.0.1
 Repository: CRAN
-Date/Publication: 2016-12-05 08:27:49
+Date/Publication: 2017-06-23 08:06:27 UTC

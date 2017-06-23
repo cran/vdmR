@@ -38,4 +38,3 @@ from 2008 to 2012. The variables are as follows:
 \url{http://www.e-stat.go.jp/SG1/estat/GL08020103.do?_toGL08020103_}
 }
 \keyword{datasets}
-

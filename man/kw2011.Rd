@@ -47,4 +47,3 @@ municipal waste in Kanto region, Japan in 2011
 \url{http://www.env.go.jp/recycle/waste_tech/}
 }
 \keyword{datasets}
-

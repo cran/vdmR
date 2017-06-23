@@ -2,8 +2,8 @@
 % Please edit documentation in R/vdmR-package.R
 \docType{package}
 \name{vdmR-package}
-\alias{vdmR}
 \alias{vdmR-package}
+\alias{vdmR}
 \title{vdmR: Visual Data Mining Tools for R}
 \description{
 Visual Data Mining Tools for R
@@ -19,4 +19,3 @@ supported in this package.
 Author: Tomokazu Fujino.
 Maintainer: Tomokazu Fujino. \email{fujino@fwu.ac.jp}
 }
-

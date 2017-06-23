@@ -27,4 +27,3 @@ vhist(FertilityRate, vsfuk2012, "hist1", "vsfuk2012", fill=Type)
 vlaunch(vsfuk2012, "main", "vsfuk2012", browse=FALSE)
 
 }
-
