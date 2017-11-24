@@ -6,6 +6,7 @@
 #' @param data data frame for default data set
 #' @param name character for the name of the generated scatter plot
 #' @param tag character for the common name of a series of linked plots
+#' @param path character string of a directory for writing HTML and SVG files
 #' @param iframe logical; if \code{TRUE}, all plot windows are displayed in the main window as inline frames
 #' @param browse logical; if \code{TRUE}, browse the main window by the default web browser through the local web server; if \code{FALSE}, generating only
 #' @export
@@ -16,13 +17,13 @@
 #' vlaunch(vsfuk2012, "main", "vsfuk2012", browse=FALSE)
 #' 
 
-vlaunch <- function(data, name, tag, iframe=FALSE, browse=TRUE){
+vlaunch <- function(data, name, tag, path = tempdir(), iframe=FALSE, browse=TRUE){
   fn <- paste0(name, ".", tag)
   basehtmlfn <- paste0(".", tag, ".svg.html")
   htmlfn <- paste0(name, basehtmlfn)
   #fnregex <- paste0("*", basehtmlfn)
-  plotfilelist <- list.files(pattern=paste0("*", basehtmlfn))
-  plotfilenames <- gsub(basehtmlfn,"",plotfilelist)
+  plotfilelist <- list.files(path, pattern=paste0("*", basehtmlfn))
+  plotfilenames <- gsub(paste0(basehtmlfn), "", plotfilelist)
   
   winlist <- paste0("var winlist=['",
                    gsub(",","','",
@@ -30,12 +31,12 @@ vlaunch <- function(data, name, tag, iframe=FALSE, browse=TRUE){
                    "'];\n")
 
   jspath <- file.path(system.file(package="vdmR"), "exec/vdmr_main.js")
-  file.copy(jspath, paste0(fn, ".js"), overwrite=TRUE)
+  file.copy(jspath, paste0(path, "/", fn, ".js"), overwrite=TRUE)
   
   csspath <- file.path(system.file(package="vdmR"), "exec/vdmr_main.css")
-  file.copy(csspath, paste0(fn, ".css"), overwrite=TRUE)
+  file.copy(csspath, paste0(path, "/", fn, ".css"), overwrite=TRUE)
   
-  z <- file(paste0(fn, ".html"),"w")
+  z <- file(paste0(path, "/", fn, ".html"),"w")
   cat("<html><head><title>", file=z)
   cat(fn, file=z)
   cat("</title></head>", file=z)
@@ -110,15 +111,16 @@ vlaunch <- function(data, name, tag, iframe=FALSE, browse=TRUE){
       s <- Rook::Rhttpd$new()
       s$add(name="vdmR",
             app=Rook::Builder$new(
-              Rook::Static$new(root=getwd(), urls="/"),
+              Rook::Static$new(root=path, urls="/"),
               Rook::Redirect$new(paste0("/", fn, ".html"))))
       s$start()
       s$browse(1)
     } else {
-      dir <- tempfile()
-      dir.create(dir)
-      fcp <- file.copy(list.files(".",paste0("*.",tag,".*")), dir)
-      utils::browseURL(file.path(dir,paste0(fn,".html")))
+      #dir <- tempfile()
+      #dir.create(dir)
+      #fcp <- file.copy(list.files(".",paste0("*.",tag,".*")), dir)
+      #utils::browseURL(file.path(dir,paste0(fn,".html")))
+      utils::browseURL(file.path(paste0(path, "/", fn,".html")))
     }
   }
   

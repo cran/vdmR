@@ -5,8 +5,8 @@
 \alias{vpcp}
 \title{Generate prallel coordinate plot with interactive functions}
 \usage{
-vpcp(data, columns, name, tag, groupColumn = NULL, scale = "std",
-  alphaLines = 0.5, missing = "exclude")
+vpcp(data, columns, name, tag, path = tempdir(), groupColumn = NULL,
+  scale = "std", alphaLines = 0.5, missing = "exclude")
 }
 \arguments{
 \item{data}{data frame for default data set}
@@ -16,6 +16,8 @@ vpcp(data, columns, name, tag, groupColumn = NULL, scale = "std",
 \item{name}{character for the name of the generated scatter plot}
 
 \item{tag}{character for the common name of a series of linked plots}
+
+\item{path}{character string of a directory for writing HTML and SVG files}
 
 \item{groupColumn}{a single variable to group (color) by}
 

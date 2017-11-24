@@ -1,0 +1,15 @@
+bibentry(bibtype = "Article",
+  title        = "{vdmR}: Generating Web-Based Visual Data Mining Tools with {R}",
+  author       = person(given = "Tomokazu",
+                        family = "Fujino",
+                        email = "fujino@fwu.ac.jp"),
+  journal      = "Journal of Statistical Software",
+  year         = "2017",
+  volume       = "82",
+  number       = "6",
+  pages        = "1--16",
+  doi          = "10.18637/jss.v082.i06",
+
+  header       = "To cite vdmR in publications use:"
+)
+

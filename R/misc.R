@@ -19,3 +19,11 @@ rename.aes <- function (x){
   plyr::rename(x, stdaes, warn_missing = FALSE)
 }
 
+htmlWrapper <- function(path, svgfn){
+	z <- file(paste0(path, "/", svgfn, ".html"),"w")
+	cat("<object data=\"", file=z)
+	cat(svgfn, file=z)
+	cat("\" type=\"image/svg+xml\" ", file=z)
+	cat("width=\"505px\" height=\"361px\"></object>", file=z)
+	close(z)
+}

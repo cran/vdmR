@@ -5,7 +5,7 @@
 \alias{vhist}
 \title{Generate histogram with interactive functions}
 \usage{
-vhist(x, data, name, tag, ...)
+vhist(x, data, name, tag, path = tempdir(), ...)
 }
 \arguments{
 \item{x}{column name of data frame \code{data} for drawing histogram}
@@ -15,6 +15,8 @@ vhist(x, data, name, tag, ...)
 \item{name}{character for the name of the generated histogram}
 
 \item{tag}{character for the common name of a series of linked plots}
+
+\item{path}{character string of a directory for writing HTML and SVG files}
 
 \item{...}{aesthetic mappings to be passed to ggplot2 methods}
 }

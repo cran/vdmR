@@ -7,6 +7,7 @@
 #' @param columns a vector of variables (either names or indices) to be axes in the plot
 #' @param name character for the name of the generated scatter plot
 #' @param tag character for the common name of a series of linked plots
+#' @param path character string of a directory for writing HTML and SVG files
 #' @param groupColumn a single variable to group (color) by
 #' @param scale method used to scale the variables
 #' @param alphaLines value of alpha scaler for the lines of the parcoord plot or a column name of the data
@@ -19,11 +20,11 @@
 #' vlaunch(vsfuk2012, "main", "vsfuk2012", browse=FALSE)
 #' 
 
-vpcp <- function(data, columns, name, tag,
+vpcp <- function(data, columns, name, tag, path = tempdir(),
                  groupColumn=NULL, scale="std", alphaLines=0.5, missing="exclude"){
 
   jspath <- file.path(system.file(package="vdmR"), "exec/vdmr_pcp.js")
-  file.copy(jspath, paste(name, ".", tag, ".js", sep=""), overwrite=TRUE)
+  file.copy(jspath, paste0(path, "/", name, ".", tag, ".js"), overwrite=TRUE)
   
   pdf(file=NULL, width=7, height=5)
   pcp <- GGally::ggparcoord(data, groupColumn=groupColumn, columns=columns, alphaLines=alphaLines, scale=scale, missing=missing) + 
@@ -39,10 +40,10 @@ vpcp <- function(data, columns, name, tag,
   gridSVG::grid.script(file=paste(name, ".", tag,".js", sep=""))
   gridSVG::grid.script(paste("var winname= '", name, "';", sep=""))
   
-  svgfn <- paste0(name, ".", tag, ".svg")
-  
-  gridSVG::grid.export(svgfn, htmlWrapper=TRUE, exportMappings="file",
+  svgfn <- paste0(path, "/", name, ".", tag, ".svg")
+  gridSVG::grid.export(svgfn, htmlWrapper=FALSE, exportMappings="file",
                        xmldecl="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+  htmlWrapper(path, paste0(name, ".", tag, ".svg"))
 
   invisible(dev.off())
   

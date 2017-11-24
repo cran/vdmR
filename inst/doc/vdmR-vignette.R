@@ -7,7 +7,7 @@ head(vsfuk2012[,1:5])
 
 ## ----warning=FALSE, message=FALSE----------------------------------------
 vscat(MortalityRate, FertilityRate, vsfuk2012, "scat01", "vsfuk2012")
-vhist(MarriageRate, vsfuk2012, "hist01", "vsfuk2012")
+#vhist(MarriageRate, vsfuk2012, "hist01", "vsfuk2012", bins=30)
 
 ## ----eval=FALSE----------------------------------------------------------
 #  vlaunch(vsfuk2012, "main", "vsfuk2012")

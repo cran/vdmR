@@ -38,7 +38,7 @@ Basically, to create VDM tools from \pkg{vdmR} are achieved in following two ste
 Here, we will show the example for generating two plots.
 <<warning=FALSE, message=FALSE>>=
 vscat(MortalityRate, FertilityRate, vsfuk2012, "scat01", "vsfuk2012")
-vhist(MarriageRate, vsfuk2012, "hist01", "vsfuk2012")
+#vhist(MarriageRate, vsfuk2012, "hist01", "vsfuk2012", bins=30)
 @
 Each command generates some files in the current working directory, which are named in the following rule:
 \begin{quote}

@@ -16,4 +16,7 @@
 #' @author
 #' Author: Tomokazu Fujino.
 #' Maintainer: Tomokazu Fujino. \email{fujino@@fwu.ac.jp}
+#'
+#' @references
+#' \insertRef{Fujino2017}{vdmR}
 NULL

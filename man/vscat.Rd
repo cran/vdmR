@@ -5,7 +5,7 @@
 \alias{vscat}
 \title{Generate scatter plot with interactive functions}
 \usage{
-vscat(x, y, data, name, tag, ...)
+vscat(x, y, data, name, tag, path = tempdir(), ...)
 }
 \arguments{
 \item{x, y}{column name of data frame \code{data} for x-axis and y-axis of scatter plot}
@@ -15,6 +15,8 @@ vscat(x, y, data, name, tag, ...)
 \item{name}{character for the name of the generated scatter plot}
 
 \item{tag}{character for the common name of a series of linked plots}
+
+\item{path}{character string of a directory for writing HTML and SVG files}
 
 \item{...}{aesthetic mappings to be passed to ggplot2 methods}
 }

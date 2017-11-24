@@ -7,6 +7,7 @@
 #' @param data data frame for default data set
 #' @param name character for the name of the generated histogram
 #' @param tag character for the common name of a series of linked plots
+#' @param path character string of a directory for writing HTML and SVG files
 #' @param ... aesthetic mappings to be passed to ggplot2 methods
 #' @importFrom grDevices dev.off pdf
 #' @importFrom stats asOneSidedFormula
@@ -18,7 +19,7 @@
 #' vlaunch(vsfuk2012, "main", "vsfuk2012", browse=FALSE)
 #'
 
-vhist <- function(x, data, name, tag, ...){
+vhist <- function(x, data, name, tag, path = tempdir(), ...){
 
   argnames <- names(as.list(match.call(expand.dots = FALSE)[-1]))
   arguments <- as.list(match.call()[-1])
@@ -33,7 +34,7 @@ vhist <- function(x, data, name, tag, ...){
   class(params)   <- "uneval"
 
   jspath <- file.path(system.file(package="vdmR"), "exec/vdmr_hist.js")
-  file.copy(jspath, paste(name, ".", tag, ".js", sep=""), overwrite=TRUE)
+  file.copy(jspath, paste0(path, "/", name, ".", tag, ".js"), overwrite=TRUE)
 
   pdf(file=NULL, width=7, height=5)
 
@@ -101,16 +102,18 @@ vhist <- function(x, data, name, tag, ...){
   grid::grid.newpage()
   grid::grid.draw(histgrob)
 
-  svgfn <- paste0(name, ".", tag, ".svg")
+  svgfn <- paste0(path, "/", name, ".", tag, ".svg")
 
-  e <- try(gridSVG::grid.export(svgfn, htmlWrapper=TRUE, exportMappings="file",
+  e <- try(gridSVG::grid.export(svgfn, htmlWrapper=FALSE, exportMappings="file",
                                 xmldecl="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"),
            silent=TRUE)
 
   if (class(e) == "try-error") {
-    gridSVG::grid.export(svgfn, htmlWrapper=TRUE, exportMappings="file",
+    gridSVG::grid.export(svgfn, htmlWrapper=FALSE, exportMappings="file",
                          xmldecl="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
   }
+
+  htmlWrapper(path, paste0(name, ".", tag, ".svg"))
 
   invisible(dev.off())
 

@@ -15,6 +15,9 @@ multiple plots is one of the main feature of this package. Currently
 scatter plot, histogram, parallel coordinate plot and choropleth map are
 supported in this package.
 }
+\references{
+\insertRef{Fujino2017}{vdmR}
+}
 \author{
 Author: Tomokazu Fujino.
 Maintainer: Tomokazu Fujino. \email{fujino@fwu.ac.jp}

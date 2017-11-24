@@ -5,7 +5,8 @@
 \alias{vcmap}
 \title{Generate choropleth map with interactive functions}
 \usage{
-vcmap(shapefile, data, mid, did, name, tag, fill = NULL, ggscale = NULL)
+vcmap(shapefile, data, mid, did, name, tag, path = tempdir(), fill = NULL,
+  ggscale = NULL)
 }
 \arguments{
 \item{shapefile}{path to ESRI shapefile to draw choropleth map}
@@ -19,6 +20,8 @@ vcmap(shapefile, data, mid, did, name, tag, fill = NULL, ggscale = NULL)
 \item{name}{character for the name of the generated scatter plot}
 
 \item{tag}{character for the common name of a series of linked plots}
+
+\item{path}{character string of a directory for writing HTML and SVG files}
 
 \item{fill}{column name assigned to the color of polygons}
 

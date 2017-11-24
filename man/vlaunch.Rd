@@ -5,7 +5,7 @@
 \alias{vlaunch}
 \title{Generate main window for interactive plot windows}
 \usage{
-vlaunch(data, name, tag, iframe = FALSE, browse = TRUE)
+vlaunch(data, name, tag, path = tempdir(), iframe = FALSE, browse = TRUE)
 }
 \arguments{
 \item{data}{data frame for default data set}
@@ -13,6 +13,8 @@ vlaunch(data, name, tag, iframe = FALSE, browse = TRUE)
 \item{name}{character for the name of the generated scatter plot}
 
 \item{tag}{character for the common name of a series of linked plots}
+
+\item{path}{character string of a directory for writing HTML and SVG files}
 
 \item{iframe}{logical; if \code{TRUE}, all plot windows are displayed in the main window as inline frames}
 
