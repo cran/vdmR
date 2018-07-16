@@ -24,8 +24,10 @@ vhist(x, data, name, tag, path = tempdir(), ...)
 \code{vscat} generates histogram of variable \code{x} of data frame \code{data} with interactive functions.
 }
 \examples{
+\donttest{
 data(vsfuk2012)
 vhist(FertilityRate, vsfuk2012, "hist1", "vsfuk2012", fill=Type)
 vlaunch(vsfuk2012, "main", "vsfuk2012", browse=FALSE)
+}
 
 }

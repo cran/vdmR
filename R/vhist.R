@@ -14,9 +14,11 @@
 #' @importFrom utils packageVersion
 #' @export
 #' @examples
+#' \donttest{
 #' data(vsfuk2012)
 #' vhist(FertilityRate, vsfuk2012, "hist1", "vsfuk2012", fill=Type)
 #' vlaunch(vsfuk2012, "main", "vsfuk2012", browse=FALSE)
+#'}
 #'
 
 vhist <- function(x, data, name, tag, path = tempdir(), ...){
@@ -50,13 +52,23 @@ vhist <- function(x, data, name, tag, path = tempdir(), ...){
   # retrieving data from histogram
   histdata <- histqp$data[,as.character(arguments$x)]
 
-  gghist <- print(histqp)
+  
+  
+  if(packageVersion("ggplot2") < '3.0.0') {
+  	gghist <- print(histqp)
+  } else {
+    print(histqp)
+  	gghist <- ggplot2::ggplot_build(histqp)
+  }
+
   histparam <- gghist$data[[1]]
   
-  if(packageVersion("ggplot2")<'2.2.0'){
+  if(packageVersion("ggplot2")<'2.2.0') {
     plotranges <- gghist$panel$ranges[[1]]
-  } else {
+  } else if(packageVersion("ggplot2") < '3.0.0') {
     plotranges <- gghist$layout$panel_ranges[[1]]
+  } else {
+  	plotranges <- gghist$layout$panel_params[[1]]
   }
 
   # "unique" is for multiple colored histogram
@@ -74,8 +86,10 @@ vhist <- function(x, data, name, tag, path = tempdir(), ...){
   
   if(packageVersion("ggplot2")<'2.2.0'){
     grid::downViewport("panel.3-4-3-4")
-  } else {
+  } else if(packageVersion("ggplot2") < '3.0.0') {
     grid::downViewport("panel.6-4-6-4")
+  } else {
+  	grid::downViewport("panel.7-5-7-5")
   }
   
   dvp <- grid::dataViewport(xscale=plotranges$x.range, yscale=plotranges$y.range)

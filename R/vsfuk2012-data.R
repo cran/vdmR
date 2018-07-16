@@ -29,6 +29,6 @@
 #' @name vsfuk2012
 #' @usage data(vsfuk2012)
 #' @format A data frame with 72 rows and 17 variables
-#' @references \url{http://www.e-stat.go.jp/SG1/estat/GL08020103.do?_toGL08020103_}
+#' @references \url{https://www.e-stat.go.jp/stat-search/files?toukei=00450013}
 #' 
 NULL

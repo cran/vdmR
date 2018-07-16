@@ -35,6 +35,6 @@ from 2008 to 2012. The variables are as follows:
 }
 }
 \references{
-\url{http://www.e-stat.go.jp/SG1/estat/GL08020103.do?_toGL08020103_}
+\url{https://www.e-stat.go.jp/stat-search/files?toukei=00450013}
 }
 \keyword{datasets}
